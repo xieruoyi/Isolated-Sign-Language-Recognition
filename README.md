@@ -32,12 +32,21 @@ The wrist plot is saved to `/kaggle/working/asl-project/first_sample_wrist_motio
 | File | Purpose |
 | --- | --- |
 | `notebooks/01_kaggle_explore.ipynb` | Standalone data exploration using a Kaggle remote kernel |
+| `notebooks/02_kaggle_train_baseline.ipynb` | Standalone Kaggle CNN training, validation, and experiment artifacts |
 | `asl.py` | Command-line baseline for inspection, preprocessing, training, and prediction |
 | `config.json` | Data paths and baseline training settings for `asl.py` |
 | `requirements.txt` | Dependency ranges for an optional local environment |
 | `requirements-lock.txt` | Package versions captured from a Windows Python 3.12 environment |
 
 The lock file is a local environment snapshot, not a specification for Kaggle's preinstalled environment. Dataset files, virtual environments, trained models, and generated artifacts are excluded from Git.
+
+## Train a baseline on Kaggle
+
+Open `notebooks/02_kaggle_train_baseline.ipynb` using the same Kaggle remote kernel. It is self-contained and discovers the attached competition data automatically.
+
+The default configuration runs a 1,000-sample pipeline check for 2 epochs. It splits by signer before sampling, caches features on disk, trains a small temporal CNN, and saves the best checkpoint, validation accuracy, per-class report, predictions, and learning curves in a unique run directory under `/kaggle/working/asl-project`.
+
+After the check succeeds, set `SAMPLE_LIMIT = None` and `EPOCHS = 20` in the notebook and rerun from the configuration cell. Save important artifacts before ending the Kaggle session. Small-subset accuracy is not a benchmark for the full task.
 
 ## Optional: run the baseline locally
 
@@ -89,11 +98,11 @@ To run `asl.py` on Kaggle instead, transfer the script and configuration to the 
 
 The baseline splits data by `participant_id`, keeping each signer in either training or validation. This helps evaluate performance on unseen signers. A 1,000-sample run is only a pipeline check and is not a meaningful benchmark for the full 250-class task.
 
-The exploration notebook and baseline script are available. Model training and full competition evaluation have not been verified on the real dataset as part of repository setup.
+The exploration notebook, Kaggle training notebook, and baseline script are available. Model training and full competition evaluation have not been verified on the real dataset as part of repository setup.
 
 This repository does not yet generate a competition-ready `submission.zip`. Submission requires a TensorFlow Lite model that accepts raw landmark sequences, includes compatible preprocessing, preserves the official output class order, and meets the competition's runtime, size, signature, and latency requirements. The current baseline accepts preprocessed features and cannot be submitted directly.
 
-Real-time camera recognition and sentence translation are outside the current scope. The next step is to establish a measured CNN baseline on Kaggle using a signer-disjoint validation split.
+Real-time camera recognition and sentence translation are outside the current scope. The next step is to execute the training notebook and record a measured CNN baseline on Kaggle using its signer-disjoint validation split.
 
 ## Data attribution
 
