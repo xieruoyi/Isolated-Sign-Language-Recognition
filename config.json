@@ -1,0 +1,9 @@
+{
+  "data_dir": "data/asl-signs",
+  "output_dir": "artifacts",
+  "frames": 32,
+  "seed": 42,
+  "validation_fraction": 0.2,
+  "batch_size": 64,
+  "epochs": 20
+}
