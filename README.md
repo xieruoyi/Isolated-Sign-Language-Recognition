@@ -33,6 +33,7 @@ The wrist plot is saved to `/kaggle/working/asl-project/first_sample_wrist_motio
 | --- | --- |
 | `notebooks/01_kaggle_explore.ipynb` | Standalone data exploration using a Kaggle remote kernel |
 | `notebooks/02_kaggle_train_baseline.ipynb` | Standalone Kaggle CNN training, validation, and experiment artifacts |
+| `notebooks/03_kaggle_train_body_reference.ipynb` | Controlled experiment using clip-level body references with the same CNN and input dimensions |
 | `asl.py` | Command-line baseline for inspection, preprocessing, training, and prediction |
 | `config.json` | Data paths and baseline training settings for `asl.py` |
 | `requirements.txt` | Dependency ranges for an optional local environment |
@@ -47,6 +48,14 @@ Open `notebooks/02_kaggle_train_baseline.ipynb` using the same Kaggle remote ker
 The default configuration uses the full dataset for up to 20 epochs, with early stopping if validation accuracy stops improving. It splits by signer before sampling, caches features on disk, trains a small temporal CNN, and saves the best checkpoint, validation accuracy, per-class report, predictions, and learning curves in a unique run directory under `/kaggle/working/asl-project`.
 
 Enable a GPU in Kaggle, select the remote kernel, and confirm that the notebook reports an available GPU. Run from the configuration cell through evaluation to generate a full-data baseline. To repeat a quick pipeline check, set `SAMPLE_LIMIT = 1000` and `EPOCHS = 2`. Save important artifacts before ending the Kaggle session. Small-subset accuracy is not a benchmark for the full task.
+
+## Experiment: preserve hand position relative to the body
+
+After saving a full-data baseline, run `notebooks/03_kaggle_train_body_reference.ipynb` on the Kaggle kernel. It replaces per-frame hand centering with a clip-level shoulder reference, using face and hand references as fallbacks when needed. Reference landmarks only define normalization: the CNN still receives 32 frames of 126 features, with the same architecture, seed, signer split, optimizer, batch size, and maximum epochs as notebook 02.
+
+The experiment writes separate `cnn_body_reference_*` run directories and records normalization fallback counts. Its optional comparison cell searches for a saved baseline, or accepts `BASELINE_RUN_DIR`. It compares accuracy and per-class recall only after checking settings, the label mapping, and the exact training and validation sample partitions. Set the path explicitly if you have several compatible baselines. A missing or incompatible baseline is reported without inventing results.
+
+The original notebook remains available for reproducibility. This is an experiment; improved accuracy has not yet been established.
 
 ## Optional: run the baseline locally
 
