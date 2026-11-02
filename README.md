@@ -34,6 +34,8 @@ The wrist plot is saved to `/kaggle/working/asl-project/first_sample_wrist_motio
 | `notebooks/01_kaggle_explore.ipynb` | Standalone data exploration using a Kaggle remote kernel |
 | `notebooks/02_kaggle_train_baseline.ipynb` | Standalone Kaggle CNN training, validation, and experiment artifacts |
 | `notebooks/03_kaggle_train_body_reference.ipynb` | Controlled experiment using clip-level body references with the same CNN and input dimensions |
+| `notebooks/04_kaggle_train_body_local_shape.ipynb` | Combined body-position and local hand-shape experiment |
+| `RESULTS.md` | Reported full-data experiment results and limitations |
 | `asl.py` | Command-line baseline for inspection, preprocessing, training, and prediction |
 | `config.json` | Data paths and baseline training settings for `asl.py` |
 | `requirements.txt` | Dependency ranges for an optional local environment |
@@ -55,7 +57,13 @@ After saving a full-data baseline, run `notebooks/03_kaggle_train_body_reference
 
 The experiment writes separate `cnn_body_reference_*` run directories and records normalization fallback counts. Its optional comparison cell searches for a saved baseline, or accepts `BASELINE_RUN_DIR`. It compares accuracy and per-class recall only after checking settings, the label mapping, and the exact training and validation sample partitions. Set the path explicitly if you have several compatible baselines. A missing or incompatible baseline is reported without inventing results.
 
-The original notebook remains available for reproducibility. This is an experiment; improved accuracy has not yet been established.
+The original notebook remains available for reproducibility. A user-provided full-data comparison reports an increase from 42.5908% to 46.2752% validation accuracy. See [RESULTS.md](RESULTS.md) for provenance, class recall, and limitations.
+
+## Experiment: combine body position and local hand shape
+
+Open `notebooks/04_kaggle_train_body_local_shape.ipynb` on the Kaggle remote kernel. It retains notebook 03's 126 body-reference features and appends 126 local hand-shape features. Each hand is centered at its wrist (or visible-point centroid when the wrist is missing) and scaled independently per frame. Missing and degenerate hands receive zero local features and masks.
+
+The CNN filters and training settings stay the same, but the input increases to `(32, 252)`, so the first layer has more parameters. This is not a parameter-matched experiment. The comparison cell accepts a saved notebook 03 run through `BASELINE_RUN_DIR`, or searches available runs, and verifies matching sample partitions and training settings. Preserve the body-reference model until the new run has been evaluated.
 
 ## Optional: run the baseline locally
 
@@ -107,7 +115,7 @@ To run `asl.py` on Kaggle instead, transfer the script and configuration to the 
 
 The baseline splits data by `participant_id`, keeping each signer in either training or validation. This helps evaluate performance on unseen signers. A 1,000-sample run is only a pipeline check and is not a meaningful benchmark for the full 250-class task.
 
-The exploration notebook, Kaggle training notebook, and baseline script are available. Model training and full competition evaluation have not been verified on the real dataset as part of repository setup.
+The exploration notebook, Kaggle training notebook, and baseline script are available. Full-data training results for notebooks 02 and 03 have been reported from Kaggle output screenshots; exact provenance and limitations are documented in [RESULTS.md](RESULTS.md). Full competition evaluation and the notebook 04 result remain unverified.
 
 This repository does not yet generate a competition-ready `submission.zip`. Submission requires a TensorFlow Lite model that accepts raw landmark sequences, includes compatible preprocessing, preserves the official output class order, and meets the competition's runtime, size, signature, and latency requirements. The current baseline accepts preprocessed features and cannot be submitted directly.
 
