@@ -35,6 +35,7 @@ The wrist plot is saved to `/kaggle/working/asl-project/first_sample_wrist_motio
 | `notebooks/02_kaggle_train_baseline.ipynb` | Standalone Kaggle CNN training, validation, and experiment artifacts |
 | `notebooks/03_kaggle_train_body_reference.ipynb` | Controlled experiment using clip-level body references with the same CNN and input dimensions |
 | `notebooks/04_kaggle_train_body_local_shape.ipynb` | Combined body-position and local hand-shape experiment |
+| `notebooks/05_kaggle_compare_training_seeds.ipynb` | Fixed signer split, paired training seeds, and tongue error analysis |
 | `RESULTS.md` | Reported full-data experiment results and limitations |
 | `asl.py` | Command-line baseline for inspection, preprocessing, training, and prediction |
 | `config.json` | Data paths and baseline training settings for `asl.py` |
@@ -64,6 +65,12 @@ The original notebook remains available for reproducibility. A user-provided ful
 Open `notebooks/04_kaggle_train_body_local_shape.ipynb` on the Kaggle remote kernel. It retains notebook 03's 126 body-reference features and appends 126 local hand-shape features. Each hand is centered at its wrist (or visible-point centroid when the wrist is missing) and scaled independently per frame. Missing and degenerate hands receive zero local features and masks.
 
 The CNN filters and training settings stay the same, but the input increases to `(32, 252)`, so the first layer has more parameters. This is not a parameter-matched experiment. The comparison cell accepts a saved notebook 03 run through `BASELINE_RUN_DIR`, or searches available runs, and verifies matching sample partitions and training settings. Preserve the body-reference model until the new run has been evaluated.
+
+## Repeat the comparison across training seeds
+
+Notebook `05_kaggle_compare_training_seeds.ipynb` fixes `SPLIT_SEED = 42` and trains both variants with `TRAIN_SEEDS = [42, 43, 44]`. The default schedules **six full-data fits of up to 20 epochs each**. Preprocessing is shared through one 252-feature cache, with the body variant reading its first 126 columns. Use a small subset, 2 epochs, and two training seeds to check the pipeline first.
+
+Outputs include per-run metrics and models, mean/sample-standard-deviation summaries, paired accuracy differences, per-class recall, and sample-aligned tongue prediction diagnostics. Completed fits can be reused if the training cell is rerun within the same study; partial fits restart. Creating a new study does not resume a previous Kaggle session. Results describe training randomness on one fixed validation split, not significance or robustness across signer splits.
 
 ## Optional: run the baseline locally
 
@@ -115,7 +122,7 @@ To run `asl.py` on Kaggle instead, transfer the script and configuration to the 
 
 The baseline splits data by `participant_id`, keeping each signer in either training or validation. This helps evaluate performance on unseen signers. A 1,000-sample run is only a pipeline check and is not a meaningful benchmark for the full 250-class task.
 
-The exploration notebook, Kaggle training notebook, and baseline script are available. Full-data training results for notebooks 02 and 03 have been reported from Kaggle output screenshots; exact provenance and limitations are documented in [RESULTS.md](RESULTS.md). Full competition evaluation and the notebook 04 result remain unverified.
+The exploration notebook, Kaggle training notebook, and baseline script are available. Full-data training results for notebooks 02 and 03 have been reported from Kaggle output screenshots; exact provenance and limitations are documented in [RESULTS.md](RESULTS.md). Notebook 04 results are also screenshot-reported; the repeated-seed study and full competition evaluation remain pending.
 
 This repository does not yet generate a competition-ready `submission.zip`. Submission requires a TensorFlow Lite model that accepts raw landmark sequences, includes compatible preprocessing, preserves the official output class order, and meets the competition's runtime, size, signature, and latency requirements. The current baseline accepts preprocessed features and cannot be submitted directly.
 
