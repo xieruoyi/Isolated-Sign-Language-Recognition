@@ -44,9 +44,9 @@ The lock file is a local environment snapshot, not a specification for Kaggle's 
 
 Open `notebooks/02_kaggle_train_baseline.ipynb` using the same Kaggle remote kernel. It is self-contained and discovers the attached competition data automatically.
 
-The default configuration runs a 1,000-sample pipeline check for 2 epochs. It splits by signer before sampling, caches features on disk, trains a small temporal CNN, and saves the best checkpoint, validation accuracy, per-class report, predictions, and learning curves in a unique run directory under `/kaggle/working/asl-project`.
+The default configuration uses the full dataset for up to 20 epochs, with early stopping if validation accuracy stops improving. It splits by signer before sampling, caches features on disk, trains a small temporal CNN, and saves the best checkpoint, validation accuracy, per-class report, predictions, and learning curves in a unique run directory under `/kaggle/working/asl-project`.
 
-After the check succeeds, set `SAMPLE_LIMIT = None` and `EPOCHS = 20` in the notebook and rerun from the configuration cell. Save important artifacts before ending the Kaggle session. Small-subset accuracy is not a benchmark for the full task.
+Enable a GPU in Kaggle, select the remote kernel, and confirm that the notebook reports an available GPU. Run from the configuration cell through evaluation to generate a full-data baseline. To repeat a quick pipeline check, set `SAMPLE_LIMIT = 1000` and `EPOCHS = 2`. Save important artifacts before ending the Kaggle session. Small-subset accuracy is not a benchmark for the full task.
 
 ## Optional: run the baseline locally
 
