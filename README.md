@@ -36,6 +36,7 @@ The wrist plot is saved to `/kaggle/working/asl-project/first_sample_wrist_motio
 | `notebooks/03_kaggle_train_body_reference.ipynb` | Controlled experiment using clip-level body references with the same CNN and input dimensions |
 | `notebooks/04_kaggle_train_body_local_shape.ipynb` | Combined body-position and local hand-shape experiment |
 | `notebooks/05_kaggle_compare_training_seeds.ipynb` | Fixed signer split, paired training seeds, and tongue error analysis |
+| `notebooks/06_kaggle_compare_signer_splits.ipynb` | Paired comparison on new held-out signer cohorts with a shared feature cache |
 | `RESULTS.md` | Reported full-data experiment results and limitations |
 | `asl.py` | Command-line baseline for inspection, preprocessing, training, and prediction |
 | `config.json` | Data paths and baseline training settings for `asl.py` |
@@ -71,6 +72,14 @@ The CNN filters and training settings stay the same, but the input increases to 
 Notebook `05_kaggle_compare_training_seeds.ipynb` fixes `SPLIT_SEED = 42` and trains both variants with `TRAIN_SEEDS = [42, 43, 44]`. The default schedules **six full-data fits of up to 20 epochs each**. Preprocessing is shared through one 252-feature cache, with the body variant reading its first 126 columns. Use a small subset, 2 epochs, and two training seeds to check the pipeline first.
 
 Outputs include per-run metrics and models, mean/sample-standard-deviation summaries, paired accuracy differences, per-class recall, and sample-aligned tongue prediction diagnostics. Completed fits can be reused if the training cell is rerun within the same study; partial fits restart. Creating a new study does not resume a previous Kaggle session. Results describe training randomness on one fixed validation split, not significance or robustness across signer splits.
+
+## Check different held-out signer cohorts
+
+Notebook `06_kaggle_compare_signer_splits.ipynb` fixes training seed 42 and evaluates both variants on split seeds 43 and 44. The default schedules **four full-data fits, each up to 20 epochs**. All samples share one disk-backed feature cache; each partition reads indexed batches instead of copying the full arrays. A disk-space check runs before cache allocation.
+
+Outputs include exact sample lists and held-out signers, per-split accuracy differences, selected class recall, sample-aligned prediction disagreements, and validation-cohort overlap. Both models share a split's samples and training settings. The split study uses one training seed and overlapping development cohorts, so its summaries are descriptive and are not independent final-test results.
+
+The completed notebook 05 study reported an average combined-feature gain of about 0.88 percentage points, winning all three paired training seeds on split 42. See [RESULTS.md](RESULTS.md) for reported metrics, provenance, and reproducibility limits.
 
 ## Optional: run the baseline locally
 
@@ -122,7 +131,7 @@ To run `asl.py` on Kaggle instead, transfer the script and configuration to the 
 
 The baseline splits data by `participant_id`, keeping each signer in either training or validation. This helps evaluate performance on unseen signers. A 1,000-sample run is only a pipeline check and is not a meaningful benchmark for the full 250-class task.
 
-The exploration notebook, Kaggle training notebook, and baseline script are available. Full-data training results for notebooks 02 and 03 have been reported from Kaggle output screenshots; exact provenance and limitations are documented in [RESULTS.md](RESULTS.md). Notebook 04 results are also screenshot-reported; the repeated-seed study and full competition evaluation remain pending.
+The exploration notebook, Kaggle training notebook, and baseline script are available. Full-data training results for notebooks 02 and 03 have been reported from Kaggle output screenshots; exact provenance and limitations are documented in [RESULTS.md](RESULTS.md). Notebook 04 results are also screenshot-reported; the repeated-seed study is also screenshot-reported; the new signer-split study and full competition evaluation remain pending.
 
 This repository does not yet generate a competition-ready `submission.zip`. Submission requires a TensorFlow Lite model that accepts raw landmark sequences, includes compatible preprocessing, preserves the official output class order, and meets the competition's runtime, size, signature, and latency requirements. The current baseline accepts preprocessed features and cannot be submitted directly.
 

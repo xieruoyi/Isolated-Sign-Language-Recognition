@@ -38,6 +38,37 @@ Notebook 04 improved accuracy over notebook 03 by **1.2685 percentage points**, 
 
 These values also come from user-provided Kaggle screenshots. The combined model is the highest reported single-run accuracy so far, but it has more parameters and substantial class-level regressions. Keep the body-reference checkpoint for comparison.
 
+## Paired training-seed study (fixed signer split)
+
+Values below were transcribed from the latest user-provided Kaggle output screenshots. The signer split is fixed at seed 42; training seeds are 42, 43, and 44. Standard deviations are sample standard deviations across these training runs.
+
+| Representation | Mean validation accuracy | Accuracy standard deviation | Mean validation loss |
+| --- | ---: | ---: | ---: |
+| Body reference | 46.1452% | 0.3822 percentage points | 2.439975 |
+| Body position + local shape | 47.0253% | 0.4031 percentage points | 2.438889 |
+
+| Training seed | Body-reference accuracy | Combined accuracy | Paired gain (percentage points) |
+| --- | ---: | ---: | ---: |
+| 42 | 46.0466% | 46.5621% | +0.515464 |
+| 43 | 46.4635% | 47.2165% | +0.753027 |
+| 44 | 45.9256% | 47.2972% | +1.371583 |
+
+Reported paired mean gain: **+0.88 percentage points**, paired gain sample standard deviation: **0.44 percentage points**, combined-model wins: **3/3**. Minor differences from recomputing the table are due to screenshot rounding.
+
+| Class | Mean body-reference recall | Mean combined recall | Support per run |
+| --- | ---: | ---: | ---: |
+| mouth | 8.4211% | 3.8596% | 95 |
+| lips | 52.7778% | 40.2778% | 96 |
+| chin | 21.9780% | 18.6813% | 91 |
+| nose | 45.8781% | 40.5018% | 93 |
+| tongue | 13.4752% | 18.4397% | 94 |
+
+The earlier single-run tongue regression did not persist in the three-seed mean. The selected face-related classes mostly did not account for the overall accuracy gain. Class-level variability remains large, especially for chin.
+
+The seed-42 scores in this study differ from the earlier standalone notebook runs. The screenshots alone do not establish the cause; environment differences, execution state, and nondeterministic operations should be checked against saved artifacts before claiming exact reproducibility. Keep the standalone runs and paired study separate rather than treating them as identical reruns.
+
+These results support a consistent small gain under training randomness on this fixed split. They do not establish significance, robustness across signer cohorts, or a representation-only effect because parameter counts still differ.
+
 ## Next experiment
 
-Notebook 04 combines body-reference coordinates with independently normalized local hand shape. It keeps the split and training settings, but doubles the feature count to 252 and increases the first convolution's parameter count. The single-run results are recorded above. Notebook 05 repeats both variants across three paired training seeds with a fixed signer split, reports optimization variability, and compares tongue predictions on the same samples. Results of that repeated-seed study are pending. A future parameter-matched ablation and new signer splits would be needed to assess capacity effects and broader robustness.
+Notebook 06 fixes training seed 42 and compares both variants on new signer split seeds 43 and 44. It schedules four fits and preprocesses all selected samples once into a shared cache. It records held-out signers, exact sample partitions, per-split paired accuracy, class recall, and cohort overlap. Results are pending. These development splits may overlap and do not constitute a separate final test set.
