@@ -38,6 +38,7 @@ The wrist plot is saved to `/kaggle/working/asl-project/first_sample_wrist_motio
 | `notebooks/05_kaggle_compare_training_seeds.ipynb` | Fixed signer split, paired training seeds, and tongue error analysis |
 | `notebooks/06_kaggle_compare_signer_splits.ipynb` | Paired comparison on new held-out signer cohorts with a shared feature cache |
 | `notebooks/07_kaggle_inspect_errors.ipynb` | Saved-prediction error inspection, landmark quality diagnostics, and animations; no training |
+| `notebooks/08_kaggle_compare_missing_frame_timing.ipynb` | Parameter-matched time-grid ablation: drop vs retain no-hand positions |
 | `RESULTS.md` | Reported full-data experiment results and limitations |
 | `asl.py` | Command-line baseline for inspection, preprocessing, training, and prediction |
 | `config.json` | Data paths and baseline training settings for `asl.py` |
@@ -89,6 +90,12 @@ Open `notebooks/07_kaggle_inspect_errors.ipynb` on the Kaggle kernel. By default
 The notebook validates metadata against the attached competition data, samples correct and incorrect mouth/tongue/awake examples, saves landmark-quality reports, and displays correct/error landmark animations. It does not import TensorFlow or train a model. Animation speed is for display only, and quality summaries use selected examples rather than an unbiased population sample. A manual review template separates observations from hypotheses.
 
 The latest new-signer-split comparison did not sustain the combined-feature gain (mean paired difference about -0.22 percentage points). Use body reference as the working baseline while inspecting errors; preserve both variants' artifacts. See [RESULTS.md](RESULTS.md).
+
+## Test missing-frame timing without changing model capacity
+
+Notebook `08_kaggle_compare_missing_frame_timing.ipynb` compares the existing body-reference preprocessing against retaining the original sequence row positions for no-hand frames. Both models use `(32, 126)` features, identical CNN parameters, and the same body reference. There is no interpolation or reconstruction of missing movement.
+
+Default settings use signer split seeds 43/44 and training seed 42, scheduling **four full-data fits of up to 20 epochs**. A shared paired cache stores both representations. Outputs include per-clip source-frame retention diagnostics, per-split accuracy differences, and accuracy by original missingness strata. For sequences longer than 32 frames, retaining missing positions can trade away visible-hand observations; a gain is not guaranteed. Preserve all validation examples.
 
 ## Optional: run the baseline locally
 

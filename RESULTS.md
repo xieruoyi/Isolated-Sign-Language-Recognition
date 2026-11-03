@@ -88,3 +88,13 @@ Selected class recall varied substantially across splits. For example, body-refe
 ## Next step: inspect errors before more training
 
 Notebook 07 reads saved validation predictions and raw landmark parquet files without importing TensorFlow or retraining. It verifies sample alignment, selects correct/error examples for mouth, tongue, and awake, summarizes missing landmarks, and renders paired landmark animations. Observations are recorded in a manual review template. These selected examples are development diagnostics, not an unbiased final test or proof of mislabeled data.
+
+## Review of eight raw landmark sequences
+
+Eight user-supplied parquet sequences were inspected locally after notebook 07 diagnostics. Their 543-landmark frame layout and landmark indices matched the expected competition order; source frame identifiers were consecutive within each file. Original video completeness and sign-label correctness were not established.
+
+One mouth error had hand landmarks in only 2 of 6 source frames, and one tongue error in 4 of 6. The existing preprocessing repeats these observations to reach 32 frames, without recovering missing movement. Another tongue example had an internal tracking gap; deleting no-hand rows removes its original time separation. Across these selected clips, the hand-validity mask was constant after no-hand rows were dropped.
+
+One awake-to-wake error had a hand present in all 21 frames, so missingness alone cannot explain every error. No wake reference clips or trained checkpoints were provided for this local review. The review motivates a controlled timing experiment, not a claim that preserving gaps will improve accuracy. Raw landmarks and local review figures are not committed.
+
+Notebook 08 compares drop-grid and full-grid missing-position handling with identical model capacity and normalization. It records visible-row retention and evaluates all validation samples by missingness stratum. Results are pending.
