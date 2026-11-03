@@ -37,6 +37,7 @@ The wrist plot is saved to `/kaggle/working/asl-project/first_sample_wrist_motio
 | `notebooks/04_kaggle_train_body_local_shape.ipynb` | Combined body-position and local hand-shape experiment |
 | `notebooks/05_kaggle_compare_training_seeds.ipynb` | Fixed signer split, paired training seeds, and tongue error analysis |
 | `notebooks/06_kaggle_compare_signer_splits.ipynb` | Paired comparison on new held-out signer cohorts with a shared feature cache |
+| `notebooks/07_kaggle_inspect_errors.ipynb` | Saved-prediction error inspection, landmark quality diagnostics, and animations; no training |
 | `RESULTS.md` | Reported full-data experiment results and limitations |
 | `asl.py` | Command-line baseline for inspection, preprocessing, training, and prediction |
 | `config.json` | Data paths and baseline training settings for `asl.py` |
@@ -80,6 +81,14 @@ Notebook `06_kaggle_compare_signer_splits.ipynb` fixes training seed 42 and eval
 Outputs include exact sample lists and held-out signers, per-split accuracy differences, selected class recall, sample-aligned prediction disagreements, and validation-cohort overlap. Both models share a split's samples and training settings. The split study uses one training seed and overlapping development cohorts, so its summaries are descriptive and are not independent final-test results.
 
 The completed notebook 05 study reported an average combined-feature gain of about 0.88 percentage points, winning all three paired training seeds on split 42. See [RESULTS.md](RESULTS.md) for reported metrics, provenance, and reproducibility limits.
+
+## Inspect errors without retraining
+
+Open `notebooks/07_kaggle_inspect_errors.ipynb` on the Kaggle kernel. By default it finds the body-reference model's saved predictions for split 44 / training seed 42 in the latest notebook 06 study. Set `RUN_DIR` explicitly for another run, or `ARTIFACT_ROOT` when using restored Kaggle outputs. Keep `validation_predictions.csv` and its matching `validation_split.csv` available; model weights and cached features are not needed.
+
+The notebook validates metadata against the attached competition data, samples correct and incorrect mouth/tongue/awake examples, saves landmark-quality reports, and displays correct/error landmark animations. It does not import TensorFlow or train a model. Animation speed is for display only, and quality summaries use selected examples rather than an unbiased population sample. A manual review template separates observations from hypotheses.
+
+The latest new-signer-split comparison did not sustain the combined-feature gain (mean paired difference about -0.22 percentage points). Use body reference as the working baseline while inspecting errors; preserve both variants' artifacts. See [RESULTS.md](RESULTS.md).
 
 ## Optional: run the baseline locally
 
@@ -131,7 +140,7 @@ To run `asl.py` on Kaggle instead, transfer the script and configuration to the 
 
 The baseline splits data by `participant_id`, keeping each signer in either training or validation. This helps evaluate performance on unseen signers. A 1,000-sample run is only a pipeline check and is not a meaningful benchmark for the full 250-class task.
 
-The exploration notebook, Kaggle training notebook, and baseline script are available. Full-data training results for notebooks 02 and 03 have been reported from Kaggle output screenshots; exact provenance and limitations are documented in [RESULTS.md](RESULTS.md). Notebook 04 results are also screenshot-reported; the repeated-seed study is also screenshot-reported; the new signer-split study and full competition evaluation remain pending.
+The exploration notebook, Kaggle training notebook, and baseline script are available. Full-data training results for notebooks 02 and 03 have been reported from Kaggle output screenshots; exact provenance and limitations are documented in [RESULTS.md](RESULTS.md). Notebook 04 results are also screenshot-reported; the repeated-seed study is also screenshot-reported; the new signer-split study is also screenshot-reported; error inspection and full competition evaluation remain pending.
 
 This repository does not yet generate a competition-ready `submission.zip`. Submission requires a TensorFlow Lite model that accepts raw landmark sequences, includes compatible preprocessing, preserves the official output class order, and meets the competition's runtime, size, signature, and latency requirements. The current baseline accepts preprocessed features and cannot be submitted directly.
 

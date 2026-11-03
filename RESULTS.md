@@ -69,6 +69,22 @@ The seed-42 scores in this study differ from the earlier standalone notebook run
 
 These results support a consistent small gain under training randomness on this fixed split. They do not establish significance, robustness across signer cohorts, or a representation-only effect because parameter counts still differ.
 
-## Next experiment
+## New signer-split study (training seed fixed at 42)
 
-Notebook 06 fixes training seed 42 and compares both variants on new signer split seeds 43 and 44. It schedules four fits and preprocesses all selected samples once into a shared cache. It records held-out signers, exact sample partitions, per-split paired accuracy, class recall, and cohort overlap. Results are pending. These development splits may overlap and do not constitute a separate final test set.
+Values were transcribed from user-provided notebook 06 output screenshots. Split seeds 43 and 44 each hold out five signers, with one held-out signer shared between cohorts.
+
+| Split seed | Body-reference accuracy | Combined accuracy | Combined minus body (percentage points) |
+| --- | ---: | ---: | ---: |
+| 43 | 45.1222% | 44.6977% | -0.424543 |
+| 44 | 42.7116% | 42.7028% | -0.008747 |
+| Descriptive mean | 43.9169% | 43.7003% | approximately -0.22 |
+
+Mean validation loss was 2.732212 for body reference and 2.759146 for combined features. The combined model won 0/2 paired comparisons; split 44 was effectively tied. Because validation cohorts overlap and only one training seed is used, these are descriptive exploratory results, not independent significance tests.
+
+The fixed-split training-seed gain did not extend to these new signer cohorts. Prefer the simpler body-reference representation (notebook 03) as the working baseline while retaining combined features as an experimental variant. This does not establish that local shape can never help; current evidence does not support its added complexity as a robust improvement.
+
+Selected class recall varied substantially across splits. For example, body-reference mouth recall was 0.325843 on split 43 and 0 on split 44. The screenshots alone do not identify whether the cause is tracking quality, sign variation, or the representation/model.
+
+## Next step: inspect errors before more training
+
+Notebook 07 reads saved validation predictions and raw landmark parquet files without importing TensorFlow or retraining. It verifies sample alignment, selects correct/error examples for mouth, tongue, and awake, summarizes missing landmarks, and renders paired landmark animations. Observations are recorded in a manual review template. These selected examples are development diagnostics, not an unbiased final test or proof of mislabeled data.
